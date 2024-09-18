@@ -23,7 +23,7 @@ public static class ServicesColletionExtensions
 
     public static IServiceCollection AddRepositories(this IServiceCollection servicesCollection)
     {
-        servicesCollection.TryAddSingleton<ICustomerRepository, CustomerRepository>();
+        servicesCollection.TryAddScoped<ICustomerRepository, CustomerRepository>();
         return servicesCollection;
     }    
     

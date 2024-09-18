@@ -1,13 +1,21 @@
+using AspNetCore.Scalar;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+builder.Services.Configure<RavenDbSettings>(builder.Configuration.GetSection("RavenDbSettings"));
 builder.Services.AddRaverDb();
 builder.Services.AddRepositories();
 builder.Services.AddDomainServices();
 builder.Services.AddMappers();
 builder.Services.AddApplicationService();
 builder.Services.AddControllers();
+builder.Services.AddHealthChecks().AddRavenDB(setup =>
+{
+    setup.Database = "EcommerceDB";
+    setup.Urls = [ "http://localhost:8080" ];
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -19,6 +27,12 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    app.UseScalar(options =>
+    {
+        options.UseTheme(Theme.Default);
+        options.RoutePrefix = "api-docs";
+    });
 }
 
 app.UseHttpsRedirection();
@@ -26,5 +40,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHealthChecks("/health");
 
 app.Run();
